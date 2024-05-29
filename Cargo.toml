@@ -1,0 +1,13 @@
+[package]
+name = "tmp36_sensor"
+version = "0.0.1"
+edition = "2021"
+authors = ["Steve Briskin <steve@viam.com>"]
+resolver = "2"
+rust-version = "1.75"
+
+[dependencies]
+micro-rdk = {git = "https://github.com/viamrobotics/micro-rdk.git", features = ["esp32"], version = "0.1.8", rev = "e5ba39f"}
+
+[package.metadata.com.viam]
+module = true
