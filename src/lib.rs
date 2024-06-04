@@ -74,6 +74,7 @@ impl Readings for Tmp36Sensor {
 
 impl SensorT<f64> for Tmp36Sensor {
     fn get_readings(&self) -> Result<TypedReadingsResult<f64>, SensorError> {
+        // TODO: deal with noise -- read X times and return the median
         let reading = self
             .reader
             .lock()
