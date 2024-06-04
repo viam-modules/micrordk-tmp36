@@ -25,6 +25,7 @@ pub fn register_models(registry: &mut ComponentRegistry) -> Result<(), RegistryE
 #[derive(DoCommand)]
 pub struct Tmp36Sensor {
     reader: AnalogReaderType<u16>,
+    offset: f64,
 }
 
 impl Tmp36Sensor {
@@ -34,11 +35,18 @@ impl Tmp36Sensor {
             return Err(SensorError::ConfigError("sensor missing board attribute"));
         }
         let board_unwrapped = board.unwrap();
-        if let Ok(reader) = board_unwrapped.get_analog_reader_by_name("tmp36".to_string()) {
-            Ok(Arc::new(Mutex::new(Self { reader })))
+
+        let offset = _cfg.get_attribute::<f64>("offset").unwrap_or(0.0);
+
+        if let Ok(analog_reader_name) = _cfg.get_attribute::<String>("analog_reader") {
+            if let Ok(reader) = board_unwrapped.get_analog_reader_by_name(analog_reader_name) {
+                Ok(Arc::new(Mutex::new(Self { reader, offset })))
+            } else {
+                Err(SensorError::ConfigError("failed to get analog reader"))
+            }
         } else {
             Err(SensorError::ConfigError(
-                "failed to get analog reader `tmp36`",
+                "failed to get 'analog_reader' value from config",
             ))
         }
     }
@@ -71,8 +79,10 @@ impl SensorT<f64> for Tmp36Sensor {
             .lock()
             .map_err(|_| SensorError::SensorGenericError("failed to get sensor lock"))?
             .read()?;
+        let readingf = reading as f64;
         let mut x = HashMap::new();
-        x.insert("millivolts".to_string(), reading as f64);
+        x.insert("temp".to_string(), (readingf - 500.0) / 10.0 + self.offset);
+        x.insert("milliv".to_string(), readingf); // for debugging
         Ok(x)
     }
 }
