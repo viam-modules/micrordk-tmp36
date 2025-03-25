@@ -111,12 +111,12 @@ impl SensorT<f64> for Tmp36Sensor {
 
         let mut x = HashMap::new();
         x.insert(
-            "temp".to_string(),
+            "temperature_c".to_string(),
             (median_reading - 500) as f64 / 10.0 + self.offset,
         ); // calculated final temp result
 
         // debugging fields
-        x.insert("temp_raw".to_string(), (median_reading - 500) as f64 / 10.0); // temp pre-offset
+        x.insert("temperature_raw".to_string(), (median_reading - 500) as f64 / 10.0); // temp pre-offset
         x.insert("milliv".to_string(), median_reading as f64); // raw reading from sensor
         x.insert("num_readings".to_string(), readings.len() as f64); // number of readings read
 
